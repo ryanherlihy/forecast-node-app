@@ -1,7 +1,7 @@
 var https = require('https');
 
 var FORECAST_IO_KEY = 'f34cdcbef1e2028089438939098c09f5';
-var ZIPCODE_KEY = 'ZwJvwbOdEH9UpRjs4da17WJDBcH70m00TJwpVkDz1NurEOUJ14K91uMDHuLIQLIK';
+var ZIPCODE_KEY = 'tpmz1nUDBATyhW7hL6IZLG3JXd5FPjjjJFTK3NoFnhdFekWZrFZdm2Wkf2Z5lip5';
 
 try {
   var location = process.argv[2];
@@ -24,16 +24,22 @@ var request = https.get('https://www.zipcodeapi.com/rest/' + ZIPCODE_KEY + '/inf
 });
 
 var getForecast = function(coordinates) {
-  var request = https.get('https://api.forecast.io/forecast/' + FORECAST_IO_KEY + '/' + coordinates, function(response) {
+  var url = 'https://api.forecast.io/forecast/' + FORECAST_IO_KEY + '/' + coordinates;
+  var request = https.get(url, function(response) {
     var body = '';
     response.on('data', function(chunk) {
       body += chunk;
     });
     response.on('end', function() {
-      var forecast = JSON.parse(body);
-      Object.keys(forecast['currently']).forEach(function(key) {
-        console.log(key + ': ' + forecast['currently'][key]);
-      });
+      try {
+        var forecast = JSON.parse(body);
+        Object.keys(forecast['currently']).forEach(function(key) {
+          console.log(key + ': ' + forecast['currently'][key]);
+        });
+      } catch (e) {
+        console.log('The response received is not in JSON format, or the url requested is missing information/incorrect');
+        console.log(e);
+      };
     });
   });
 };
